@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" role="img" aria-labelledby="title desc">
+  <title id="title">Miquel L&#243;pez Escoriza monogram</title>
+  <desc id="desc">A clean geometric monogram with the initials MLE.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#17324d"/>
+      <stop offset="0.52" stop-color="#245f73"/>
+      <stop offset="1" stop-color="#6f8f72"/>
+    </linearGradient>
+  </defs>
+  <rect width="420" height="420" rx="26" fill="url(#bg)"/>
+  <path d="M80 296V124h39l58 87 58-87h39v172h-42V197l-43 64h-24l-43-64v99H80Z" fill="#f7fbff"/>
+  <path d="M290 296V124h54v36h-12v100h12v36h-54Z" fill="#f7fbff" opacity=".9"/>
+  <path d="M68 348h284" stroke="#f7fbff" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+</svg>

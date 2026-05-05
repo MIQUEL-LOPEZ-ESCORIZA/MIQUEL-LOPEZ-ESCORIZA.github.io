@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Miquel L&oacute;pez Escoriza - data science, medical imaging, foundation models, and multimodal learning.">
+    <title>Miquel L&oacute;pez Escoriza</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#about">Miquel L&oacute;pez Escoriza</a>
+      <nav class="top-nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#education">Education</a>
+        <a href="cv.pdf">CV</a>
+      </nav>
+    </header>
+
+    <main class="page-shell">
+      <aside class="profile">
+        <img class="avatar" src="assets/avatar.svg" alt="Miquel L&oacute;pez Escoriza monogram">
+        <h1>Miquel L&oacute;pez Escoriza</h1>
+        <p class="tagline">MSc Data Science at EPFL</p>
+        <p class="location">Lausanne, Switzerland</p>
+
+        <div class="profile-links" aria-label="Profile links">
+          <a href="mailto:miquel.lopezescoriza@epfl.ch">Email</a>
+          <a href="https://www.linkedin.com/in/miquel-l%C3%B3pez-escoriza-42b721256/">LinkedIn</a>
+          <a href="https://github.com/MIQUEL-LOPEZ-ESCORIZA">GitHub</a>
+          <a href="cv.pdf">CV</a>
+        </div>
+
+        <div class="quick-facts">
+          <p><strong>Focus</strong> Foundation models, multimodal datasets, medical imaging</p>
+          <p><strong>Tools</strong> Python, C++, PyTorch, TensorFlow, OpenCV</p>
+          <p><strong>Languages</strong> Spanish, Catalan, English, French</p>
+        </div>
+      </aside>
+
+      <section class="content">
+        <section id="about" class="section">
+          <h2>About</h2>
+          <p>
+            I am an MSc Data Science student at EPFL, working at the intersection of large-scale multimodal
+            learning, medical imaging, and foundation models. My current work at VILAB focuses on building
+            scalable image and video datasets with pseudolabeling and tokenization pipelines for downstream
+            visual learning.
+          </p>
+          <p>
+            Previously, I completed a double BSc in Data Science and Engineering and Engineering Physics at
+            Universitat Polit&egrave;cnica de Catalunya through CFIS, UPC's selective double-degree engineering program.
+            I also spent a year at NYU Courant Institute working on foundation models for brain MRI.
+          </p>
+        </section>
+
+        <section class="section news">
+          <h2>News</h2>
+          <ul>
+            <li><time datetime="2026-02">Feb 2026</time> Started work with VILAB at EPFL on large-scale multimodal dataset construction.</li>
+            <li><time datetime="2025-09">Sep 2025</time> Began the MSc in Data Science at EPFL.</li>
+            <li><time datetime="2025-05">May 2025</time> Completed a year-long research internship and bachelor thesis at NYU Courant Institute.</li>
+            <li><time datetime="2025-05">May 2025</time> Graduated from UPC with a double BSc in Data Science and Engineering and Engineering Physics.</li>
+          </ul>
+        </section>
+
+        <section id="projects" class="section">
+          <h2>Relevant Projects</h2>
+
+          <article class="entry">
+            <div class="entry-meta">
+              <h3>Large Scale Multimodal Dataset Construction</h3>
+              <span>VILAB, EPFL</span>
+              <time>Feb 2026 - Present</time>
+            </div>
+            <p>
+              Constructing a large-scale multimodal image and video dataset; benchmarking pseudolabelers for
+              optical flow, depth, surface normals, SSL features, and related visual signals.
+            </p>
+            <p>
+              Developing a distributed GPU-accelerated pipeline to pseudolabel and tokenize large-scale image and
+              video data efficiently.
+            </p>
+            <a class="text-link" href="https://vilab.epfl.ch/">VILAB</a>
+          </article>
+
+          <article class="entry">
+            <div class="entry-meta">
+              <h3>Segmentation Foundation Model for 3D CT Segmentation</h3>
+              <span>BIG, EPFL</span>
+              <time>Sep 2025 - Jan 2026</time>
+            </div>
+            <p>
+              Adapted SAM-2 to 3D CT volumes using inference-time memory and propagation strategies, evaluating
+              the method on 2,500 CT scans from TotalSegmentator.
+            </p>
+            <p>
+              Achieved up to a 12.5% Dice improvement on bone structures.
+            </p>
+            <a class="text-link" href="https://bigwww.epfl.ch/">Biomedical Imaging Group</a>
+          </article>
+
+          <article class="entry">
+            <div class="entry-meta">
+              <h3>Foundation Models for Brain MRI</h3>
+              <span>NYU Courant Institute</span>
+              <time>Sep 2024 - May 2025</time>
+            </div>
+            <p>
+              Built a large-scale brain MRI dataset with anatomical and clinical labels, pretrained ViT models
+              with MAE and DINO, and designed supervised segmentation pretraining to add anatomical priors to
+              image embeddings.
+            </p>
+            <p>
+              Bachelor thesis supervised by Prof. Carlos F. Granda; paper currently under review at npj Digital
+              Medicine.
+            </p>
+            <a class="text-link" href="https://cims.nyu.edu/dynamic/">NYU Courant</a>
+          </article>
+        </section>
+
+        <section id="education" class="section">
+          <h2>Education</h2>
+
+          <article class="entry compact">
+            <div class="entry-meta">
+              <h3>MSc in Data Science</h3>
+              <span>&Eacute;cole Polytechnique F&eacute;d&eacute;rale de Lausanne</span>
+              <time>Sep 2025 - May 2027</time>
+            </div>
+            <p>GPA: 6/6. Top grades in Markov Chains and Algorithmic Applications, Mathematics of Data, and Machine Learning.</p>
+          </article>
+
+          <article class="entry compact">
+            <div class="entry-meta">
+              <h3>Double BSc in Data Science and Engineering &amp; Engineering Physics</h3>
+              <span>Universitat Polit&egrave;cnica de Catalunya - CFIS</span>
+              <time>Sep 2020 - May 2025</time>
+            </div>
+            <p>
+              GPA: 8.4/10 and 8.6/10. Selected for CFIS, UPC's highly selective double-degree engineering program.
+            </p>
+          </article>
+        </section>
+
+        <section class="section">
+          <h2>Achievements &amp; Awards</h2>
+          <ul class="awards">
+            <li><strong>Bachelor's thesis distinction.</strong> Awarded 10/10 with highest honors; recognized as the best bachelor's thesis in AI by the Faculty of Informatics and second best university-wide.</li>
+            <li><strong>Research scholarship.</strong> Awarded a triple scholarship by CFIS, NYU, and the Spanish Government to conduct a senior thesis at NYU Courant Institute.</li>
+            <li><strong>Best national grade in university entrance exam.</strong> Achieved 13.75/14 in the Andorran 2020 University Access Exam.</li>
+            <li><strong>University scholarship.</strong> Awarded support covering tuition and housing costs for admission to CFIS.</li>
+          </ul>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>&copy; 2026 Miquel L&oacute;pez Escoriza</span>
+      <span>Built for GitHub Pages</span>
+    </footer>
+  </body>
+</html>
