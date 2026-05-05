@@ -87,12 +87,35 @@ a:focus-visible {
 }
 
 .avatar {
-  display: block;
-  width: 168px;
-  aspect-ratio: 1;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(31, 41, 51, 0.12);
-  box-shadow: var(--shadow);
+  object-position: center;
+  display: block;
+  margin: 0 auto 1.2rem auto;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.profile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1.2rem 0;
+}
+
+.profile-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-decoration: none;
+}
+
+.profile-links i {
+  width: 1.2rem;
+  text-align: center;
+  font-size: 1rem;
 }
 
 .profile h1 {
@@ -109,7 +132,7 @@ a:focus-visible {
   color: var(--muted);
   font-size: 15px;
 }
-
+/* 
 .profile-links {
   display: flex;
   flex-wrap: wrap;
@@ -135,7 +158,7 @@ a:focus-visible {
   border-color: var(--accent);
   color: var(--accent-strong);
   text-decoration: none;
-}
+} */
 
 .quick-facts {
   padding-top: 18px;
