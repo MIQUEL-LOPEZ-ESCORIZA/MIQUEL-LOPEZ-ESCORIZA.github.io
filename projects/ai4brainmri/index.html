@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI4BrainMRI — Comparative Study of Anatomical and Learned Features for Structural Brain MRI</title>
+<meta name="description" content="A comparative study of anatomical, CNN, and vision-transformer models for structural brain MRI, introducing Anatomy Segmentation Pretraining (ASP).">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top">AI4Brain<sup>MRI</sup></a>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#takeaways">Takeaways</a>
+      <a href="#citation">Citation</a>
+    </div>
+  </div>
+</div>
+
+<a id="top"></a>
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-badge">Manuscript in preparation · 2025</div>
+    <h1>Comparative Study of Anatomical and Learned Features in AI Models for Structural Brain MRI</h1>
+    <div class="authors">
+      Boyang Yu<span class="eq">1,*</span>, Miquel López Escoriza<span class="eq">1,*</span>, Long Chen<span class="eq">1,2</span>, Arjun V. Masurkar<span class="eq">2</span>, Narges Razavian<span class="eq">2</span>, Carlos Fernández-Granda<span class="eq">1,3,†</span>
+    </div>
+    <div class="affils">
+      <sup>1</sup>Center for Data Science, NYU &nbsp;·&nbsp; <sup>2</sup>Department of Neurology, NYU Grossman School of Medicine &nbsp;·&nbsp; <sup>3</sup>Courant Institute of Mathematical Sciences, NYU
+      <br>* Equal contribution &nbsp;&nbsp; † Corresponding author
+    </div>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="https://github.com/MIQUEL-LOPEZ-ESCORIZA/ai4brainmri" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        Code on GitHub
+      </a>
+      <span class="btn btn-ghost">Paper — coming soon</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="num">18</div><div class="lbl">public datasets</div></div>
+    <div class="stat"><div class="num">~80K</div><div class="lbl">participants</div></div>
+    <div class="stat"><div class="num">96K+</div><div class="lbl">MRI scans</div></div>
+    <div class="stat"><div class="num">7</div><div class="lbl">clinical tasks</div></div>
+  </div>
+
+  <section id="abstract" style="padding-top:8px;">
+    <div class="eyebrow">Abstract</div>
+    <div class="abstract-card" style="margin-top:14px;">
+      We comprehensively evaluate three popular feature-extraction paradigms in AI-based neuroimaging modeling: <b>(1)</b> computation of anatomical surfaces and volumes, <b>(2)</b> supervised learning with convolutional neural networks (CNNs), and <b>(3)</b> unsupervised pretraining of vision transformer (ViT) foundation models, followed by supervised finetuning. Our study is based on 18 publicly available datasets containing 3D structural T1-weighted MRI scans from approximately 80,000 participants across seven distinct clinical tasks. We observe that a linear model based on anatomical features matches the diagnostic performance of complex nonlinear features learned by sophisticated AI frameworks, including foundation models trained on thousands of scans. Conversely, CNNs and pretrained ViTs learn features that implicitly capture relevant anatomical information, bypassing the need for explicit feature extraction. Building on these insights, we propose <b>Anatomy Segmentation Pretraining (ASP)</b>, a novel method to incorporate anatomical information during foundation-model pretraining, which outperforms existing models in biological age estimation.
+    </div>
+  </section>
+</div>
+
+<section id="overview" class="section-alt">
+  <div class="wrap">
+    <div class="eyebrow">Study Overview</div>
+    <h2 class="section-title">Three ways to extract features from a brain MRI</h2>
+    <p class="lede">We compare linear models built on hand-computed anatomical features, convolutional neural networks trained from scratch, and vision transformers pretrained on a large general-population cohort — with and without our proposed anatomy-guided pretraining — across a pretraining cohort and seven downstream clinical tasks drawn from 18 public datasets.</p>
+    <figure style="margin-top:24px;">
+      <img src="figures/overview.png" alt="Overview of cohorts and AI models used in the study" loading="lazy">
+      <figcaption><b>Figure 1.</b> Cohorts used for pretraining, downstream training, internal testing, and external evaluation, and the four feature-extraction approaches compared in the study: anatomical linear models, CNNs, ViTs pretrained via masked autoencoding, and ViTs pretrained with our proposed Anatomy Segmentation Pretraining (ASP).</figcaption>
+    </figure>
+
+    <div class="grid-cards">
+      <div class="card">
+        <div class="tag">Anatomical</div>
+        <h3>Linear model on FreeSurfer features</h3>
+        <p>Logistic/linear regression on 178 regional volumes, cortical surface areas, and cortical thickness values extracted with FreeSurfer's recon-all pipeline.</p>
+      </div>
+      <div class="card">
+        <div class="tag">CNN</div>
+        <h3>Supervised ResNet / U-Net</h3>
+        <p>ResNet-18 for classification tasks and U-Net for segmentation, trained end-to-end from scratch on each task's labeled data.</p>
+      </div>
+      <div class="card">
+        <div class="tag">Pretrained ViT</div>
+        <h3>Masked autoencoding foundation model</h3>
+        <p>A 3D ViT-Base pretrained via masked autoencoding (MAE) on 69,878 MRI scans, then adapted per task with linear probing, LoRA, or full finetuning.</p>
+      </div>
+      <div class="card ours">
+        <div class="tag">ASP ViT · ours</div>
+        <h3>Anatomy Segmentation Pretraining</h3>
+        <p>Starts from the MAE-pretrained ViT, then continues pretraining on an auxiliary brain-region segmentation task to explicitly inject anatomical grounding into the embedding.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <div class="eyebrow">Method</div>
+    <h2 class="section-title">Anatomy Segmentation Pretraining (ASP)</h2>
+    <p class="lede">Simple anatomical-feature models are surprisingly strong (see Results). This motivates directly injecting anatomical information into a ViT during pretraining, rather than hoping it emerges implicitly from masked-image reconstruction alone.</p>
+
+    <figure style="margin-top:24px; max-width:640px; margin-left:auto; margin-right:auto;">
+      <img src="figures/asp-architecture.png" alt="Anatomy Segmentation Pretraining architecture diagram" loading="lazy">
+      <figcaption style="text-align:center;"><b>Figure 2.</b> A brain-region prompt selects one of 39 anatomical regions; its embedding is added to the ViT's image embedding and passed through a lightweight, skip-connection-free mask decoder that predicts a binary segmentation mask for that region.</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step"><div class="n">1</div><p><b>Start from MAE pretraining.</b> A 3D ViT-Base is first pretrained with masked autoencoding on the full pretraining cohort. Linear-probing shows its embedding already predicts brain volumes and demographics increasingly well — but only up to a point.</p></div>
+      <div class="step"><div class="n">2</div><p><b>Bottleneck decoder, no skip connections.</b> Unlike U-Net-style segmentation models, the mask decoder receives no local skip features — segmentation must be driven entirely by the global ViT embedding, forcing it to concentrate anatomical detail there rather than in the decoder.</p></div>
+      <div class="step"><div class="n">3</div><p><b>Prompt-based regions.</b> Predicting all 39 regions at once would require prohibitively large label volumes. Instead, a region is sampled at random each step; its learned embedding is added to the image embedding, and the decoder outputs a single binary mask for that region — an approach inspired by prompt-based segmentation models such as SAM.</p></div>
+      <div class="step"><div class="n">4</div><p><b>Freeze, then alternate.</b> The encoder is first frozen while the decoder learns to read out existing MAE features. Training then alternates between segmentation and MAE epochs, which prevents the model from forgetting the general visual features it already learned.</p></div>
+    </div>
+
+    <p class="lede" style="margin-top:22px;">The 39 regions were selected from an initial FreeSurfer parcellation of 112 regions by keeping disease-relevant structures and merging symmetric or anatomically related regions, discarding only those contributing under 1% of total brain volume.</p>
+  </div>
+</section>
+
+<section id="results" class="section-alt">
+  <div class="wrap">
+    <div class="eyebrow">Results</div>
+    <h2 class="section-title">Diagnostics and segmentation across seven clinical tasks</h2>
+    <p class="lede">Alzheimer's diagnosis (8 cohorts), Parkinson's diagnosis, epilepsy diagnosis, tumor IDH-mutation detection, whole-tumor segmentation, and stroke-lesion segmentation. Across nearly every task, <b>ASP ViT, Pretrained ViT, CNN, and the simple anatomical logistic-regression model perform statistically indistinguishably</b> — anatomical features alone remain a remarkably strong baseline.</p>
+    <figure style="margin-top:24px;">
+      <img src="figures/results-diagnostics.png" alt="Diagnostic and segmentation results across seven clinical tasks" loading="lazy">
+      <figcaption><b>Figure 3.</b> Performance comparison across diagnostic and segmentation tasks. ASP ViT reaches the highest macro-AUC in most Alzheimer's cohorts and the highest AUC for tumor IDH mutation, but differences versus the CNN and anatomical baseline are rarely statistically significant. CNNs could not be trained for epilepsy due to limited data.</figcaption>
+    </figure>
+
+    <h2 class="section-title" style="margin-top:48px;">More training data reveals a gap — and where ASP wins</h2>
+    <p class="lede">With a much larger cohort for a single task (biological age estimation, n≈62,890), differences between models finally emerge, and <b>ASP ViT achieves the lowest error of all models</b>, in both the internal cohort and two independent external cohorts.</p>
+    <figure style="margin-top:24px;">
+      <img src="figures/results-age.png" alt="Brain age estimation results across internal and external cohorts" loading="lazy">
+      <figcaption><b>Figure 4.</b> ASP ViT reaches a mean absolute error of 2.54 years internally and 4.19 years on both external cohorts (NACC, ADNI) — outperforming the plain pretrained ViT, the anatomical model, and the CNN. Predicted brain age is consistently elevated in patients with dementia and, to a lesser extent, mild cognitive impairment, relative to their chronological age.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="takeaways">
+  <div class="wrap">
+    <div class="eyebrow">Discussion</div>
+    <h2 class="section-title">Key takeaways</h2>
+    <div class="takeaways">
+      <div class="takeaway"><div class="dot"></div><p><b>Anatomical features remain competitive.</b> Across public cohorts of a few hundred to a few thousand scans, a simple linear model on FreeSurfer features matches CNNs and foundation-model ViTs — while being cheap, interpretable, and easy to train.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Diagnostic performance may be saturating.</b> On current public dataset sizes, the three paradigms converge to similar performance ceilings; larger cohorts, not more sophisticated models, look like the more promising lever.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>ViTs learn anatomy implicitly — slowly.</b> MAE pretraining alone gradually encodes anatomical structure, but explicit segmentation supervision (ASP) accelerates this substantially and pays off once enough downstream data is available, as shown in brain-age estimation.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Fast, learned segmentation could make anatomical pipelines scale.</b> Tools like FastSurfer could replace costly classical pipelines, keeping anatomical-feature models practical as an efficient, robust baseline going forward.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="citation" class="section-alt">
+  <div class="wrap">
+    <div class="eyebrow">Citation</div>
+    <h2 class="section-title">BibTeX</h2>
+    <div class="cite-block">@article{yu2025comparative,
+  title   = {Comparative Study of Anatomical and Learned Features in AI Models for Structural Brain MRI},
+  author  = {Yu, Boyang and Lopez Escoriza, Miquel and Chen, Long and Masurkar, Arjun V. and Razavian, Narges and Fernandez-Granda, Carlos},
+  year    = {2025},
+  note    = {Manuscript in preparation}
+}</div>
+    <p class="cite-note">This work is currently unpublished. The citation above will be updated with a DOI / arXiv identifier once the manuscript is released.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <b>Code</b>
+        <div><a href="https://github.com/MIQUEL-LOPEZ-ESCORIZA/ai4brainmri" target="_blank" rel="noopener">github.com/MIQUEL-LOPEZ-ESCORIZA/ai4brainmri</a></div>
+        <div>Training and evaluation code — actively under development.</div>
+      </div>
+      <div class="foot-col">
+        <b>Contact</b>
+        <div><a href="mailto:cfgranda@cims.nyu.edu">cfgranda@cims.nyu.edu</a></div>
+        <div>Corresponding author</div>
+      </div>
+      <div class="foot-col">
+        <b>Acknowledgements</b>
+        <div>Alzheimer's Association grant AARG-NTF-21-848627</div>
+        <div>NSF grant 2404476 · NYU IT High Performance Computing</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
