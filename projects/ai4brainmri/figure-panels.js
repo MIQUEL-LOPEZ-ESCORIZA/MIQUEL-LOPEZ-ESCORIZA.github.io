@@ -7,6 +7,9 @@ if (figure && dialog && typeof dialog.showModal === 'function') {
   let trigger;
 
   figure.querySelectorAll('[data-panel]').forEach((button) => {
+    const region = figure.querySelector(`.asp-panel-${button.dataset.panel}`);
+    ['pointerenter', 'focus'].forEach((event) => button.addEventListener(event, () => region.classList.add('is-highlighted')));
+    ['pointerleave', 'blur'].forEach((event) => button.addEventListener(event, () => region.classList.remove('is-highlighted')));
     button.addEventListener('click', () => {
       const content = document.querySelector(`#asp-panel-${button.dataset.panel}`);
       title.textContent = content.dataset.title;
@@ -27,6 +30,7 @@ if (figure && dialog && typeof dialog.showModal === 'function') {
   });
   dialog.addEventListener('close', () => trigger?.focus({ preventScroll: true }));
 
+  figure.querySelector('.asp-controls').hidden = false;
   figure.querySelector('.asp-hotspots').hidden = false;
   figure.querySelector('#asp-hint').hidden = false;
 }

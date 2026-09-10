@@ -59,9 +59,9 @@ section{padding:52px 0;}
 .section-alt{background:var(--bg-alt); border-top:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft);}
 .eyebrow{font-size:12.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent);}
 .section-title{font-size:24px; margin-top:8px; margin-bottom:16px;}
-.lede{color:var(--text-soft); font-size:16px; max-width:720px;}
+.lede{color:var(--text-soft); font-size:16px;}
 .subsection-title{font-size:20px; margin-top:32px; margin-bottom:12px;}
-.source-note{font-size:13px; color:var(--text-faint); max-width:720px; line-height:1.6;}
+.source-note{font-size:13px; color:var(--text-faint); line-height:1.6;}
 
 .abstract-card{background:var(--card); border:1px solid var(--border); border-radius:6px; padding:32px; font-size:16px; color:var(--text-soft);}
 .abstract-card b{color:var(--text);}
@@ -132,3 +132,20 @@ footer a:hover{color:var(--accent);}
 .foot-col b{display:block; color:var(--text-soft); font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;}
 .foot-col div{margin-bottom:4px;}
 .foot-col{min-width:0; overflow-wrap:anywhere;}
+
+/* Supporting methodology stays secondary to the main narrative. */
+.supporting-details{margin-top:28px;}
+.supporting-details .subsection-title{font-family:'Inter',sans-serif; font-size:15px; font-weight:600; margin-top:0; margin-bottom:10px; color:var(--text-soft);}
+.supporting-details .lede{font-size:14px; line-height:1.65;}
+.supporting-details .source-note{font-size:12px;}
+
+/* Labeled controls offer the same explanations as clicking the figure. */
+.asp-controls:not([hidden]){display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;}
+.asp-control{display:flex; align-items:center; gap:8px; flex:1 1 auto; min-height:44px; padding:9px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--text-soft); font:inherit; font-size:13px; cursor:pointer; transition:background .15s ease,border-color .15s ease;}
+.panel-letter{color:var(--accent); font-weight:700; font-size:15px;}
+.panel-plus{margin-left:auto; color:var(--accent); font-size:18px; line-height:1;}
+.asp-control:hover,.asp-control:focus-visible{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-strong);}
+.asp-control:focus-visible{outline:2px solid var(--accent); outline-offset:3px;}
+.asp-panel:hover,.asp-panel:focus-visible,.asp-panel.is-highlighted{background:rgba(61,46,140,0.045); box-shadow:inset 0 0 0 2px rgba(61,46,140,0.5);}
+@media (max-width:600px){.asp-control{flex-basis:calc(50% - 8px);} .asp-controls{gap:6px;}}
+@media (prefers-reduced-motion:reduce){.asp-control{transition:none;}}
