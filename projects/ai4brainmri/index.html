@@ -70,8 +70,10 @@
     <h2 class="section-title">Three ways to extract features from a brain MRI</h2>
     <p class="lede">The study uses 18 public datasets for pretraining and evaluation across seven clinical tasks. We compare linear models using anatomical measurements, CNNs trained from scratch, and pretrained vision transformers. For the transformers, we evaluate both masked autoencoding alone and additional Anatomy Segmentation Pretraining (ASP).</p>
     <figure style="margin-top:24px;">
-      <img src="figures/overview_transparent.png" alt="Overview of cohorts and AI models used in the study" loading="lazy">
-      <figcaption><b>Figure 1.</b> Cohorts used for pretraining, downstream training, internal testing, and external evaluation, and the four feature-extraction approaches compared in the study: anatomical linear models, CNNs, ViTs pretrained via masked autoencoding, and ViTs pretrained with Anatomy Segmentation Pretraining (ASP).</figcaption>
+      <a class="figure-link" href="figures/overview_transparent.png" target="_blank" rel="noopener" aria-label="Open this figure at full resolution">
+        <img src="figures/overview_transparent.png" alt="Overview of cohorts and AI models used in the study" width="1600" height="1163" loading="lazy" decoding="async">
+      </a>
+      <figcaption><b>Figure 1.</b> Cohorts used for pretraining, downstream training, internal testing, and external evaluation, and the four feature-extraction approaches compared in the study: anatomical linear models, CNNs, ViTs pretrained via masked autoencoding, and ViTs pretrained with Anatomy Segmentation Pretraining (ASP). Cohort counts refer to MRI scans, which can include repeated scans from the same participant.</figcaption>
     </figure>
 
     <div class="grid-cards">
@@ -88,7 +90,7 @@
       <div class="card">
         <div class="tag">Pretrained ViT</div>
         <h3>ViT with masked autoencoding</h3>
-        <p>A 3D ViT-Base pretrained via masked autoencoding (MAE) on 69,878 MRI scans, then adapted per task with linear probing, LoRA, or full finetuning.</p>
+        <p>A 3D ViT-Base trained to reconstruct masked MRI patches. The source cohort contains 69,878 scans from 65,249 participants, with a participant-level holdout excluded from optimization.</p>
       </div>
       <div class="card">
         <div class="tag">ASP ViT</div>
@@ -96,6 +98,11 @@
         <p>An MAE-pretrained ViT further trained to segment brain regions, so that its image embedding encodes anatomical information.</p>
       </div>
     </div>
+
+    <h3 class="subsection-title">Cohorts and evaluation</h3>
+    <p class="lede">The pretraining data come from UK Biobank, HCP, CamCAN, and IXI. All splits are made at the participant level, keeping repeated scans together. Ten percent of UK Biobank participants (6,950 scans) are excluded from MAE and ASP optimization. This holdout is used to monitor anatomical and demographic probes during pretraining and later to evaluate age estimation internally.</p>
+    <p class="lede">For Alzheimer's diagnosis, models are trained on ADNI and tested on held-out ADNI participants and seven independent cohorts: NACC, AIBL, MIRIAD, and OASIS 1–4. The study also compares BrainIAC, a separately pretrained model, and UNETR for lesion segmentation. BrainIAC is excluded from the Alzheimer's comparison because its pretraining data overlap with several external test cohorts.</p>
+    <p class="source-note">Cohort details: <a href="https://arxiv.org/html/2609.06807v1#Sx2">Results</a> and <a href="https://arxiv.org/html/2609.06807v1#S3.SS1">Supplementary §3.1</a>.</p>
   </div>
 </section>
 
@@ -105,19 +112,34 @@
     <h2 class="section-title">Anatomy Segmentation Pretraining (ASP)</h2>
     <p class="lede">The performance of anatomical-feature models motivates using anatomy as a pretraining target. ASP builds on masked autoencoding by training the ViT to predict brain-region segmentation masks from its image embedding.</p>
 
-    <figure style="margin-top:24px; max-width:640px; margin-left:auto; margin-right:auto;">
-      <img src="figures/asp-architecture.png" alt="Anatomy Segmentation Pretraining architecture diagram" loading="lazy">
-      <figcaption style="text-align:center;"><b>Figure 2.</b> A brain-region prompt selects one of 39 anatomical regions; its embedding is added to the ViT's image embedding and passed through a lightweight mask decoder without skip connections that predicts a binary segmentation mask for that region.</figcaption>
+    <figure id="figure-asp" class="study-figure">
+      <a class="figure-link" href="figures/seg_mae_transparent.png" target="_blank" rel="noopener" aria-label="Open the ASP architecture, training, and ablation figure at full resolution">
+        <img src="figures/seg_mae_transparent.png" alt="Five-panel ASP figure: region-prompt architecture, anatomical probes across three training phases, regional segmentation IoU, example masks, and age-estimation ablations" width="7992" height="8000" loading="lazy" decoding="async">
+      </a>
+      <figcaption><b>Figure 2.</b> Anatomy Segmentation Pretraining: architecture (a), representation learning during pretraining (b), regional segmentation performance (c), example predictions (d), and training ablations (e). This is Figure 4 in the paper. <span class="figure-hint">Select the figure to view it at full resolution.</span></figcaption>
     </figure>
 
     <div class="steps">
-      <div class="step"><div class="n">1</div><p><b>Start from MAE pretraining.</b> A 3D ViT-Base is first pretrained with masked autoencoding on the full pretraining cohort. Linear probing shows that the embedding becomes more predictive of brain volumes and demographics during pretraining, before those gains level off.</p></div>
-      <div class="step"><div class="n">2</div><p><b>Decode from the image embedding.</b> The mask decoder has no skip connections from the encoder. It therefore relies on the global ViT embedding for anatomical information, without access to local encoder features as in a U-Net.</p></div>
+      <div class="step"><div class="n">1</div><p><b>Start from MAE pretraining.</b> A 3D ViT-Base reconstructs MRI volumes with 75% of their 16 × 16 × 16-voxel patches masked. This first stage runs for 1,000 epochs, learning an image representation without diagnostic labels.</p></div>
+      <div class="step"><div class="n">2</div><p><b>Decode from the image embedding.</b> The decoder takes a 768-dimensional image embedding and upsamples it to a 128 × 128 × 128 mask through six 3D transposed-convolution blocks. With no skip connections, the decoder must obtain anatomical information from this embedding.</p></div>
       <div class="step"><div class="n">3</div><p><b>Segment one region at a time.</b> To reduce the memory needed for labels, one of 39 regions is sampled at each training step. Its learned embedding is added to the image embedding, and the decoder predicts a binary mask for that region. This approach is inspired by prompt-based segmentation models such as SAM.</p></div>
-      <div class="step"><div class="n">4</div><p><b>Freeze, then alternate.</b> The encoder is first frozen while the decoder learns to read out existing MAE features. Training then alternates between segmentation and MAE epochs, to help retain the visual features learned during initial pretraining.</p></div>
+      <div class="step"><div class="n">4</div><p><b>Freeze, then alternate.</b> The encoder is frozen for 100 epochs while the decoder learns to use the MAE features. Encoder and decoder are then trained jointly for 400 epochs, alternating segmentation and masked reconstruction to help retain the features learned during MAE pretraining.</p></div>
     </div>
 
-    <p class="lede" style="margin-top:22px;">The 39 regions were selected from an initial FreeSurfer parcellation of 112 regions by keeping disease-relevant structures and merging symmetric or anatomically related regions, discarding only those contributing under 1% of total brain volume.</p>
+    <p class="lede" style="margin-top:22px;">The segmentation targets are generated by FreeSurfer, starting from 112 anatomical labels. Symmetric and related structures are merged into 39 regions. Small regions are excluded when they also lack a strong disease association; disease-relevant structures such as the hippocampus are retained. These are automated anatomical labels, distinct from the manual tumor and stroke masks used for downstream evaluation.</p>
+    <h3 class="subsection-title">What the ASP figure shows</h3>
+    <dl class="panel-guide">
+      <div><dt>a · A region-conditioned prediction</dt><dd>The region index selects a learned embedding, which is added to the MRI embedding before decoding. The prompt identifies an anatomical region; it does not supply a diagnostic label or a spatial outline.</dd></div>
+      <div><dt>b · Anatomy in the learned representation</dt><dd>Linear probes measure how well the image embedding predicts anatomical volumes, age, and the recorded gender variable. The shaded intervals mark MAE pretraining, decoder training with a frozen encoder, and joint ASP training. Volume prediction improves during MAE and largely levels off. During ASP, brain-stem and hippocampal volume prediction improve further, while the age probe changes little. Better anatomical probes do not imply an improvement in every target.</dd></div>
+      <div><dt>c–d · Regional accuracy and example masks</dt><dd>Panel c compares intersection over union (IoU), the overlap between predicted and reference masks, before and after ASP. Higher values indicate better segmentation. ASP improves regional overlap, but performance varies considerably. Panel d contrasts the relatively well-recovered pallidum with the more difficult, irregular superior frontal cortex. The decoder is a pretraining tool for learning anatomy, rather than a replacement for a dedicated segmentation pipeline.</dd></div>
+      <div><dt>e · Which training choices matter?</dt><dd>The age-estimation ablations test prior MAE pretraining, decoder warm-up with a frozen encoder, and alternating reconstruction updates. Removing alternation increases external NACC error; removing both alternation and freezing increases it further. MAE alone and training from scratch have higher errors still.</dd></div>
+    </dl>
+    <p class="source-note">Panel e shows an ASP error of approximately 4.32 years. <a href="https://arxiv.org/html/2609.06807v1#S3.T11">Supplementary Table 11</a> reports 4.32 for full finetuning and 4.19 for LoRA; the main age-estimation results below use LoRA.</p>
+
+    <h3 class="subsection-title">Adapting the encoder to clinical tasks</h3>
+    <p class="lede">Parkinson's diagnosis and IDH-mutation prediction use linear probes on frozen ViT features. The other downstream tasks use low-rank adaptation (LoRA), which trains small updates to the attention layers together with the task head. Full finetuning is evaluated separately in the ablations. For tumor and stroke segmentation, the encoder is paired with a U-Net–style decoder; this differs from the bottleneck decoder used during ASP.</p>
+    <p class="lede">Except for the already standardized lesion-segmentation cohorts, scans undergo FreeSurfer preprocessing and quality control. Images and masks are aligned to MNI152 space at 1 mm isotropic resolution. ASP therefore uses anatomical supervision during pretraining, even though a downstream prediction does not require the 178 extracted anatomical measurements as inputs.</p>
+    <p class="source-note">Method details: <a href="https://arxiv.org/html/2609.06807v1#Sx3">Methods</a> and <a href="https://arxiv.org/html/2609.06807v1#S3">Supplementary §3</a>.</p>
   </div>
 </section>
 
@@ -127,16 +149,28 @@
     <h2 class="section-title">Diagnosis and lesion segmentation</h2>
     <p class="lede">We evaluate Alzheimer's diagnosis across eight cohorts, Parkinson's diagnosis, epilepsy diagnosis, tumor IDH-mutation detection, whole-tumor segmentation, and stroke-lesion segmentation. <b>Most comparisons do not show statistically significant differences between models.</b> Anatomical logistic regression remains competitive on diagnostic tasks; CNNs and ViTs are also compared on segmentation.</p>
     <figure style="margin-top:24px;">
-      <img src="figures/results-diagnostics.png" alt="Diagnostic and segmentation results across seven clinical tasks" loading="lazy">
-      <figcaption><b>Figure 3.</b> Performance comparison across diagnostic and segmentation tasks. ASP ViT reaches the highest macro-AUC in most Alzheimer's cohorts and the highest AUC for tumor IDH mutation, but differences from the CNN and anatomical baseline are rarely statistically significant. CNNs could not be trained for epilepsy due to limited data.</figcaption>
+      <a class="figure-link" href="figures/results-diagnostics_transparent.png" target="_blank" rel="noopener" aria-label="Open this figure at full resolution">
+        <img src="figures/results-diagnostics_transparent.png" alt="Alzheimer’s macro-AUC across eight cohorts and age groups, other diagnostic AUCs, epilepsy probabilities, and tumor and stroke segmentation Dice scores" width="1106" height="1600" loading="lazy" decoding="async">
+      </a>
+      <figcaption><b>Figure 3.</b> Panel a compares Alzheimer's macro-AUC across cohorts; panel b shows age-stratified performance alongside the age distribution. Panel c covers the other diagnoses and lesion-segmentation tasks. Higher AUC and Dice scores indicate better performance. Error bars show 95% confidence intervals, estimated with 1,000 bootstrap resamples of the held-out test set. This is Figure 2 in the paper.</figcaption>
     </figure>
 
+    <p class="lede">The Alzheimer's task distinguishes healthy controls, mild cognitive impairment (MCI), and Alzheimer's disease. Training uses soft labels of 0, 0.5, and 1; evaluation includes pairwise AUCs and their macro-average. ASP has the highest macro-AUC in seven of eight cohorts, but the paper reports a significant improvement over the CNN and anatomical model only in OASIS 2.</p>
+    <p class="lede">The MAE-pretrained ViT has the highest AUC for Parkinson’s and epilepsy, while ASP has the highest AUC for tumor IDH-mutation prediction. The IDH differences are not statistically significant.</p>
+    <p class="lede">With all training data, U-Net has the highest tumor Dice score and the MAE-pretrained ViT has the highest stroke Dice score. The paper reports significant differences only against UNETR in these comparisons. When tumor training data are reduced to 10%, both pretrained ViTs outperform U-Net and UNETR.</p>
+    <p class="lede">The epilepsy experiment has only 82 training scans, and no CNN result is reported because of the limited training data. EPISURG contains only epilepsy cases: its probability distribution shows how the model scores those cases, but cannot establish specificity or an external case–control AUC.</p>
+    <p class="source-note">Evaluation details: <a href="https://arxiv.org/html/2609.06807v1#Sx2">Results</a>, <a href="https://arxiv.org/html/2609.06807v1#Sx3.SSx7">Statistical analysis</a>, and <a href="https://arxiv.org/html/2609.06807v1#S2.SS2">Supplementary §2.2</a>.</p>
+
     <h2 class="section-title" style="margin-top:48px;">Brain age estimation in a larger cohort</h2>
-    <p class="lede">For biological age estimation, the cohort is substantially larger (n≈62,890). Here, <b>ASP ViT has the lowest prediction error among the models evaluated</b>, both internally and on two independent external cohorts.</p>
+    <p class="lede">Age estimation uses approximately 62,890 training scans from UK Biobank, HCP, CamCAN, and IXI. Evaluation uses 6,950 held-out UK Biobank scans and healthy-control scans from NACC (1,136) and ADNI (2,791). <b>ASP ViT has the lowest mean absolute error in all three cohorts.</b> Here, brain age is the age predicted from MRI, with chronological age used as the regression target.</p>
     <figure style="margin-top:24px;">
-      <img src="figures/results-age.png" alt="Brain age estimation results across internal and external cohorts" loading="lazy">
-      <figcaption><b>Figure 4.</b> ASP ViT reaches a mean absolute error of 2.54 years internally and 4.19 years on each external cohort (NACC and ADNI), lower than the MAE-pretrained ViT, anatomical model, and CNN. Predicted brain age is consistently elevated in patients with dementia and, to a lesser extent, mild cognitive impairment, relative to their chronological age.</figcaption>
+      <a class="figure-link" href="figures/results-age_transparent.png" target="_blank" rel="noopener" aria-label="Open this figure at full resolution">
+        <img src="figures/results-age_transparent.png" alt="Brain age estimation results across internal and external cohorts" width="1086" height="1600" loading="lazy" decoding="async">
+      </a>
+      <figcaption><b>Figure 4.</b> Age-estimation error on the internal UK Biobank holdout (a), NACC (b), and ADNI (c), with breakdowns by age and gender. ASP errors are 2.54, 4.19, and 4.19 years, compared with 2.89, 5.20, and 5.51 for the MAE-pretrained ViT. Lower error is better. The lower plots in b and c apply ASP to healthy controls, MCI, and dementia groups. This is Figure 3 in the paper; “MAE” in these plots means mean absolute error.</figcaption>
     </figure>
+    <p class="lede">ASP's advantage over MAE pretraining alone is 0.35 years internally and more than a year on each external cohort. The age breakdowns show larger model differences above 80, an age range less represented in training. Predicted ages tend to be higher for dementia patients than for healthy controls in the same age bins, with a smaller shift for MCI. These group differences should be read alongside the age-dependent prediction bias visible in the plots.</p>
+    <p class="source-note">Age-estimation results: <a href="https://arxiv.org/html/2609.06807v1#Sx2">Results</a> and <a href="https://arxiv.org/html/2609.06807v1#S3.T11">Supplementary Table 11</a>.</p>
   </div>
 </section>
 
@@ -148,8 +182,9 @@
       <div class="takeaway"><div class="dot"></div><p><b>Anatomical features remain competitive.</b> Across public cohorts of a few hundred to a few thousand scans, a linear model on FreeSurfer features performs comparably to CNNs and pretrained ViTs. The regression model is inexpensive to train and its features are interpretable.</p></div>
       <div class="takeaway"><div class="dot"></div><p><b>Dataset size may limit diagnostic performance.</b> The three approaches achieve similar results on the public datasets studied. This suggests that larger cohorts could be useful, though these comparisons alone do not establish what limits performance.</p></div>
       <div class="takeaway"><div class="dot"></div><p><b>Segmentation supervision helps ViTs learn anatomy.</b> Anatomical information develops gradually during MAE pretraining. ASP accelerates this process and improves prediction on the larger brain-age estimation task.</p></div>
-      <div class="takeaway"><div class="dot"></div><p><b>Faster segmentation could reduce feature-extraction costs.</b> Although linear models are inexpensive to train, extracting anatomical features can be costly. Tools such as FastSurfer could reduce this cost and make anatomical baselines easier to apply to larger cohorts.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Faster segmentation could reduce feature-extraction costs.</b> Although linear models are inexpensive to train, FreeSurfer preprocessing averaged 6.11 hours per scan in the study’s analysis of 1,500 successful processing logs. Tools such as FastSurfer could reduce this cost; that proposed substitution is not evaluated here.</p></div>
     </div>
+    <p class="lede" style="margin-top:24px;">These findings concern the structural T1-weighted MRI tasks and cohorts studied. Similar diagnostic scores do not establish that the models are equivalent. Because the internal age holdout was also used for pretraining probes, the independent NACC and ADNI evaluations provide an important check on generalization.</p>
   </div>
 </section>
 

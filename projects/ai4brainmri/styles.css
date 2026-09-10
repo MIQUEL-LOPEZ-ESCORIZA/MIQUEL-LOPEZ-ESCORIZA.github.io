@@ -59,6 +59,8 @@ section{padding:52px 0;}
 .eyebrow{font-size:12.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent);}
 .section-title{font-size:24px; margin-top:8px; margin-bottom:16px;}
 .lede{color:var(--text-soft); font-size:16px; max-width:720px;}
+.subsection-title{font-size:20px; margin-top:32px; margin-bottom:12px;}
+.source-note{font-size:13px; color:var(--text-faint); max-width:720px; line-height:1.6;}
 
 .abstract-card{background:var(--card); border:1px solid var(--border); border-radius:6px; padding:32px; font-size:16px; color:var(--text-soft);}
 .abstract-card b{color:var(--text);}
@@ -66,6 +68,10 @@ section{padding:52px 0;}
 figure{margin:0;}
 /* Keep the original scientific figures on a matching white surface. */
 figure img{width:100%; height:auto; display:block; background:#fff;}
+.study-figure{margin-top:24px;}
+.figure-link{display:block; background:#fff; cursor:zoom-in;}
+.figure-link:focus-visible{outline:2px solid var(--accent); outline-offset:5px;}
+.figure-hint{color:var(--accent);}
 figcaption{font-size:13.5px; color:var(--text-faint); margin-top:12px; line-height:1.55;}
 figcaption b{color:var(--text-soft);}
 
@@ -84,6 +90,10 @@ figcaption b{color:var(--text-soft);}
 .step .n{flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent-strong); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center;}
 .step p{font-size:14.5px; color:var(--text-soft); margin:0;}
 .step p b{color:var(--text);}
+.panel-guide{max-width:720px; margin:0;}
+.panel-guide > div{padding:16px 0; border-bottom:1px solid var(--border-soft);}
+.panel-guide dt{font-size:15px; font-weight:600; color:var(--text);}
+.panel-guide dd{margin:6px 0 0; font-size:15px; color:var(--text-soft);}
 
 /* ---------- Takeaways ---------- */
 .takeaways{margin-top:20px; display:grid; gap:12px;}
@@ -103,3 +113,4 @@ footer a{color:var(--text-soft); text-decoration:none;}
 footer a:hover{color:var(--accent);}
 .foot-col b{display:block; color:var(--text-soft); font-size:12px; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;}
 .foot-col div{margin-bottom:4px;}
+.foot-col{min-width:0; overflow-wrap:anywhere;}
