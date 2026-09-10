@@ -59,7 +59,7 @@
   <section id="abstract" style="padding-top:8px;">
     <div class="eyebrow">Abstract</div>
     <div class="abstract-card" style="margin-top:14px;">
-      We comprehensively evaluate three popular feature-extraction paradigms in AI-based neuroimaging modeling: <b>(1)</b> computation of anatomical surfaces and volumes, <b>(2)</b> supervised learning with convolutional neural networks (CNNs), and <b>(3)</b> unsupervised pretraining of vision transformer (ViT) foundation models, followed by supervised finetuning. Our study is based on 18 publicly available datasets containing 3D structural T1-weighted MRI scans from approximately 80,000 participants across seven distinct clinical tasks. We observe that a linear model based on anatomical features matches the diagnostic performance of complex nonlinear features learned by sophisticated AI frameworks, including foundation models trained on thousands of scans. Conversely, CNNs and pretrained ViTs learn features that implicitly capture relevant anatomical information, bypassing the need for explicit feature extraction. Building on these insights, we propose <b>Anatomy Segmentation Pretraining (ASP)</b>, a novel method to incorporate anatomical information during foundation-model pretraining, which outperforms existing models in biological age estimation.
+      We compare three approaches to extracting features from structural brain MRI: <b>(1)</b> computation of anatomical surfaces and volumes, <b>(2)</b> supervised learning with convolutional neural networks (CNNs), and <b>(3)</b> unsupervised pretraining of vision transformers (ViTs), followed by supervised finetuning. Our study is based on 18 publicly available datasets containing 3D structural T1-weighted MRI scans from approximately 80,000 participants across seven clinical tasks. A linear model using anatomical features achieves diagnostic performance comparable to CNNs and pretrained ViTs, including models pretrained on thousands of scans. We also find that CNNs and pretrained ViTs capture anatomical information without explicit feature extraction. We introduce <b>Anatomy Segmentation Pretraining (ASP)</b> to incorporate this information during ViT pretraining. ASP improves biological age estimation over the other models evaluated in this study.
     </div>
   </section>
 </div>
@@ -68,17 +68,17 @@
   <div class="wrap">
     <div class="eyebrow">Study Overview</div>
     <h2 class="section-title">Three ways to extract features from a brain MRI</h2>
-    <p class="lede">We compare linear models built on hand-computed anatomical features, convolutional neural networks trained from scratch, and vision transformers pretrained on a large general-population cohort — with and without our proposed anatomy-guided pretraining — across a pretraining cohort and seven downstream clinical tasks drawn from 18 public datasets.</p>
+    <p class="lede">The study uses 18 public datasets for pretraining and evaluation across seven clinical tasks. We compare linear models using anatomical measurements, CNNs trained from scratch, and pretrained vision transformers. For the transformers, we evaluate both masked autoencoding alone and additional Anatomy Segmentation Pretraining (ASP).</p>
     <figure style="margin-top:24px;">
       <img src="figures/overview_transparent.png" alt="Overview of cohorts and AI models used in the study" loading="lazy">
-      <figcaption><b>Figure 1.</b> Cohorts used for pretraining, downstream training, internal testing, and external evaluation, and the four feature-extraction approaches compared in the study: anatomical linear models, CNNs, ViTs pretrained via masked autoencoding, and ViTs pretrained with our proposed Anatomy Segmentation Pretraining (ASP).</figcaption>
+      <figcaption><b>Figure 1.</b> Cohorts used for pretraining, downstream training, internal testing, and external evaluation, and the four feature-extraction approaches compared in the study: anatomical linear models, CNNs, ViTs pretrained via masked autoencoding, and ViTs pretrained with Anatomy Segmentation Pretraining (ASP).</figcaption>
     </figure>
 
     <div class="grid-cards">
       <div class="card">
         <div class="tag">Anatomical</div>
         <h3>Linear model on FreeSurfer features</h3>
-        <p>Logistic/linear regression on 178 regional volumes, cortical surface areas, and cortical thickness values extracted with FreeSurfer's recon-all pipeline.</p>
+        <p>Logistic or linear regression on 178 regional volumes, cortical surface areas, and cortical thickness values extracted with FreeSurfer's recon-all pipeline.</p>
       </div>
       <div class="card">
         <div class="tag">CNN</div>
@@ -87,13 +87,13 @@
       </div>
       <div class="card">
         <div class="tag">Pretrained ViT</div>
-        <h3>Masked autoencoding foundation model</h3>
+        <h3>ViT with masked autoencoding</h3>
         <p>A 3D ViT-Base pretrained via masked autoencoding (MAE) on 69,878 MRI scans, then adapted per task with linear probing, LoRA, or full finetuning.</p>
       </div>
       <div class="card">
-        <div class="tag">ASP ViT · </div>
+        <div class="tag">ASP ViT</div>
         <h3>Anatomy Segmentation Pretraining</h3>
-        <p>Starts from the MAE-pretrained ViT, then continues pretraining on an auxiliary brain-region segmentation task to explicitly inject anatomical grounding into the embedding.</p>
+        <p>An MAE-pretrained ViT further trained to segment brain regions, so that its image embedding encodes anatomical information.</p>
       </div>
     </div>
   </div>
@@ -103,18 +103,18 @@
   <div class="wrap">
     <div class="eyebrow">Method</div>
     <h2 class="section-title">Anatomy Segmentation Pretraining (ASP)</h2>
-    <p class="lede">Simple anatomical-feature models are surprisingly strong (see Results). This motivates directly injecting anatomical information into a ViT during pretraining, rather than hoping it emerges implicitly from masked-image reconstruction alone.</p>
+    <p class="lede">The performance of anatomical-feature models motivates using anatomy as a pretraining target. ASP builds on masked autoencoding by training the ViT to predict brain-region segmentation masks from its image embedding.</p>
 
     <figure style="margin-top:24px; max-width:640px; margin-left:auto; margin-right:auto;">
       <img src="figures/asp-architecture.png" alt="Anatomy Segmentation Pretraining architecture diagram" loading="lazy">
-      <figcaption style="text-align:center;"><b>Figure 2.</b> A brain-region prompt selects one of 39 anatomical regions; its embedding is added to the ViT's image embedding and passed through a lightweight, skip-connection-free mask decoder that predicts a binary segmentation mask for that region.</figcaption>
+      <figcaption style="text-align:center;"><b>Figure 2.</b> A brain-region prompt selects one of 39 anatomical regions; its embedding is added to the ViT's image embedding and passed through a lightweight mask decoder without skip connections that predicts a binary segmentation mask for that region.</figcaption>
     </figure>
 
     <div class="steps">
-      <div class="step"><div class="n">1</div><p><b>Start from MAE pretraining.</b> A 3D ViT-Base is first pretrained with masked autoencoding on the full pretraining cohort. Linear-probing shows its embedding already predicts brain volumes and demographics increasingly well — but only up to a point.</p></div>
-      <div class="step"><div class="n">2</div><p><b>Bottleneck decoder, no skip connections.</b> Unlike U-Net-style segmentation models, the mask decoder receives no local skip features — segmentation must be driven entirely by the global ViT embedding, forcing it to concentrate anatomical detail there rather than in the decoder.</p></div>
-      <div class="step"><div class="n">3</div><p><b>Prompt-based regions.</b> Predicting all 39 regions at once would require prohibitively large label volumes. Instead, a region is sampled at random each step; its learned embedding is added to the image embedding, and the decoder outputs a single binary mask for that region — an approach inspired by prompt-based segmentation models such as SAM.</p></div>
-      <div class="step"><div class="n">4</div><p><b>Freeze, then alternate.</b> The encoder is first frozen while the decoder learns to read out existing MAE features. Training then alternates between segmentation and MAE epochs, which prevents the model from forgetting the general visual features it already learned.</p></div>
+      <div class="step"><div class="n">1</div><p><b>Start from MAE pretraining.</b> A 3D ViT-Base is first pretrained with masked autoencoding on the full pretraining cohort. Linear probing shows that the embedding becomes more predictive of brain volumes and demographics during pretraining, before those gains level off.</p></div>
+      <div class="step"><div class="n">2</div><p><b>Decode from the image embedding.</b> The mask decoder has no skip connections from the encoder. It therefore relies on the global ViT embedding for anatomical information, without access to local encoder features as in a U-Net.</p></div>
+      <div class="step"><div class="n">3</div><p><b>Segment one region at a time.</b> To reduce the memory needed for labels, one of 39 regions is sampled at each training step. Its learned embedding is added to the image embedding, and the decoder predicts a binary mask for that region. This approach is inspired by prompt-based segmentation models such as SAM.</p></div>
+      <div class="step"><div class="n">4</div><p><b>Freeze, then alternate.</b> The encoder is first frozen while the decoder learns to read out existing MAE features. Training then alternates between segmentation and MAE epochs, to help retain the visual features learned during initial pretraining.</p></div>
     </div>
 
     <p class="lede" style="margin-top:22px;">The 39 regions were selected from an initial FreeSurfer parcellation of 112 regions by keeping disease-relevant structures and merging symmetric or anatomically related regions, discarding only those contributing under 1% of total brain volume.</p>
@@ -124,18 +124,18 @@
 <section id="results" class="section-alt">
   <div class="wrap">
     <div class="eyebrow">Results</div>
-    <h2 class="section-title">Diagnostics and segmentation across seven clinical tasks</h2>
-    <p class="lede">Alzheimer's diagnosis (8 cohorts), Parkinson's diagnosis, epilepsy diagnosis, tumor IDH-mutation detection, whole-tumor segmentation, and stroke-lesion segmentation. Across nearly every task, <b>ASP ViT, Pretrained ViT, CNN, and the simple anatomical logistic-regression model perform statistically indistinguishably</b> — anatomical features alone remain a remarkably strong baseline.</p>
+    <h2 class="section-title">Diagnosis and lesion segmentation</h2>
+    <p class="lede">We evaluate Alzheimer's diagnosis across eight cohorts, Parkinson's diagnosis, epilepsy diagnosis, tumor IDH-mutation detection, whole-tumor segmentation, and stroke-lesion segmentation. <b>Most comparisons do not show statistically significant differences between models.</b> Anatomical logistic regression remains competitive on diagnostic tasks; CNNs and ViTs are also compared on segmentation.</p>
     <figure style="margin-top:24px;">
       <img src="figures/results-diagnostics.png" alt="Diagnostic and segmentation results across seven clinical tasks" loading="lazy">
-      <figcaption><b>Figure 3.</b> Performance comparison across diagnostic and segmentation tasks. ASP ViT reaches the highest macro-AUC in most Alzheimer's cohorts and the highest AUC for tumor IDH mutation, but differences versus the CNN and anatomical baseline are rarely statistically significant. CNNs could not be trained for epilepsy due to limited data.</figcaption>
+      <figcaption><b>Figure 3.</b> Performance comparison across diagnostic and segmentation tasks. ASP ViT reaches the highest macro-AUC in most Alzheimer's cohorts and the highest AUC for tumor IDH mutation, but differences from the CNN and anatomical baseline are rarely statistically significant. CNNs could not be trained for epilepsy due to limited data.</figcaption>
     </figure>
 
-    <h2 class="section-title" style="margin-top:48px;">More training data reveals a gap — and where ASP wins</h2>
-    <p class="lede">With a much larger cohort for a single task (biological age estimation, n≈62,890), differences between models finally emerge, and <b>ASP ViT achieves the lowest error of all models</b>, in both the internal cohort and two independent external cohorts.</p>
+    <h2 class="section-title" style="margin-top:48px;">Brain age estimation in a larger cohort</h2>
+    <p class="lede">For biological age estimation, the cohort is substantially larger (n≈62,890). Here, <b>ASP ViT has the lowest prediction error among the models evaluated</b>, both internally and on two independent external cohorts.</p>
     <figure style="margin-top:24px;">
       <img src="figures/results-age.png" alt="Brain age estimation results across internal and external cohorts" loading="lazy">
-      <figcaption><b>Figure 4.</b> ASP ViT reaches a mean absolute error of 2.54 years internally and 4.19 years on both external cohorts (NACC, ADNI) — outperforming the plain pretrained ViT, the anatomical model, and the CNN. Predicted brain age is consistently elevated in patients with dementia and, to a lesser extent, mild cognitive impairment, relative to their chronological age.</figcaption>
+      <figcaption><b>Figure 4.</b> ASP ViT reaches a mean absolute error of 2.54 years internally and 4.19 years on each external cohort (NACC and ADNI), lower than the MAE-pretrained ViT, anatomical model, and CNN. Predicted brain age is consistently elevated in patients with dementia and, to a lesser extent, mild cognitive impairment, relative to their chronological age.</figcaption>
     </figure>
   </div>
 </section>
@@ -143,12 +143,12 @@
 <section id="takeaways">
   <div class="wrap">
     <div class="eyebrow">Discussion</div>
-    <h2 class="section-title">Key takeaways</h2>
+    <h2 class="section-title">Discussion and implications</h2>
     <div class="takeaways">
-      <div class="takeaway"><div class="dot"></div><p><b>Anatomical features remain competitive.</b> Across public cohorts of a few hundred to a few thousand scans, a simple linear model on FreeSurfer features matches CNNs and foundation-model ViTs — while being cheap, interpretable, and easy to train.</p></div>
-      <div class="takeaway"><div class="dot"></div><p><b>Diagnostic performance may be saturating.</b> On current public dataset sizes, the three paradigms converge to similar performance ceilings; larger cohorts, not more sophisticated models, look like the more promising lever.</p></div>
-      <div class="takeaway"><div class="dot"></div><p><b>ViTs learn anatomy implicitly — slowly.</b> MAE pretraining alone gradually encodes anatomical structure, but explicit segmentation supervision (ASP) accelerates this substantially and pays off once enough downstream data is available, as shown in brain-age estimation.</p></div>
-      <div class="takeaway"><div class="dot"></div><p><b>Fast, learned segmentation could make anatomical pipelines scale.</b> Tools like FastSurfer could replace costly classical pipelines, keeping anatomical-feature models practical as an efficient, robust baseline going forward.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Anatomical features remain competitive.</b> Across public cohorts of a few hundred to a few thousand scans, a linear model on FreeSurfer features performs comparably to CNNs and pretrained ViTs. The regression model is inexpensive to train and its features are interpretable.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Dataset size may limit diagnostic performance.</b> The three approaches achieve similar results on the public datasets studied. This suggests that larger cohorts could be useful, though these comparisons alone do not establish what limits performance.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Segmentation supervision helps ViTs learn anatomy.</b> Anatomical information develops gradually during MAE pretraining. ASP accelerates this process and improves prediction on the larger brain-age estimation task.</p></div>
+      <div class="takeaway"><div class="dot"></div><p><b>Faster segmentation could reduce feature-extraction costs.</b> Although linear models are inexpensive to train, extracting anatomical features can be costly. Tools such as FastSurfer could reduce this cost and make anatomical baselines easier to apply to larger cohorts.</p></div>
     </div>
   </div>
 </section>
@@ -178,7 +178,7 @@
       <div class="foot-col">
         <b>Code</b>
         <div><a href="https://github.com/MIQUEL-LOPEZ-ESCORIZA/ai4brainmri" target="_blank" rel="noopener">github.com/MIQUEL-LOPEZ-ESCORIZA/ai4brainmri</a></div>
-        <div>Training and evaluation code — actively under development.</div>
+        <div>Training and evaluation code. Under development.</div>
       </div>
       <div class="foot-col">
         <b>Contact</b>
